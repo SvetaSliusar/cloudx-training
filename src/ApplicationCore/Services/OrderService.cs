@@ -5,6 +5,7 @@ using Microsoft.eShopWeb.ApplicationCore.Entities.OrderAggregate;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
 using Microsoft.eShopWeb.ApplicationCore.Specifications;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Microsoft.eShopWeb.ApplicationCore.Services
@@ -27,7 +28,7 @@ namespace Microsoft.eShopWeb.ApplicationCore.Services
             _itemRepository = itemRepository;
         }
 
-        public async Task CreateOrderAsync(int basketId, Address shippingAddress)
+        public async Task<Order> CreateOrderAsync(int basketId, Address shippingAddress)
         {
             var basketSpec = new BasketWithItemsSpecification(basketId);
             var basket = await _basketRepository.FirstOrDefaultAsync(basketSpec);
@@ -47,8 +48,9 @@ namespace Microsoft.eShopWeb.ApplicationCore.Services
             }).ToList();
 
             var order = new Order(basket.BuyerId, shippingAddress, items);
-
             await _orderRepository.AddAsync(order);
+
+            return order;
         }
     }
 }
